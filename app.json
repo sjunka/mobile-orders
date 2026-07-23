@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "_scaffold",
-    "slug": "_scaffold",
+    "name": "mobile-orders-front",
+    "slug": "mobile-orders-front",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
