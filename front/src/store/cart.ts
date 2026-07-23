@@ -28,8 +28,7 @@ export const useCart = create<CartState>((set) => ({
   addLine: (product, modifiers, quantity) =>
     set((state) => {
       const line = makeLine(product, modifiers, quantity)
-      const existing = state.lines.find((l) => l.id === line.id)
-      if (!existing) return { lines: [...state.lines, line] }
+      if (!state.lines.some((l) => l.id === line.id)) return { lines: [...state.lines, line] }
       return {
         lines: state.lines.map((l) =>
           l.id === line.id ? makeLine(l.product, l.modifiers, l.quantity + quantity) : l,
@@ -37,12 +36,12 @@ export const useCart = create<CartState>((set) => ({
       }
     }),
 
+  // Removing is its own action, so quantity floors at 1.
   setQuantity: (lineId, quantity) =>
     set((state) => ({
-      lines: state.lines.flatMap((l) => {
-        if (l.id !== lineId) return [l]
-        return quantity < 1 ? [] : [makeLine(l.product, l.modifiers, quantity)]
-      }),
+      lines: state.lines.map((l) =>
+        l.id === lineId ? makeLine(l.product, l.modifiers, Math.max(1, quantity)) : l,
+      ),
     })),
 
   removeLine: (lineId) => set((state) => ({ lines: state.lines.filter((l) => l.id !== lineId) })),

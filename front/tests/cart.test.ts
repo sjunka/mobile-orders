@@ -74,9 +74,9 @@ describe('cart lines', () => {
     expect(lines()).toHaveLength(2)
   })
 
-  it('removes a line when its quantity drops to zero', () => {
+  it('floors quantity at 1 — removing is its own action', () => {
     addLine(burger, [], 1)
     setQuantity(lines()[0].id, 0)
-    expect(lines()).toHaveLength(0)
+    expect(lines()[0].quantity).toBe(1)
   })
 })

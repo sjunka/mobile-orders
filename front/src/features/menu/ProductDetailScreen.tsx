@@ -83,7 +83,8 @@ export function ProductDetailScreen({ route, navigation }: Props) {
         theme="accent"
         onPress={() => {
           addLine(product, selected, quantity)
-          navigation.navigate('Cart')
+          // Back to the menu so the guest keeps shopping; the header shows the count.
+          navigation.goBack()
         }}
       >
         Add to cart
