@@ -42,3 +42,8 @@ yarn-error.*
 
 # Tamagui build cache
 .tamagui/
+
+# Agents and Claude
+.agents
+.claude
+skills-lock.json
