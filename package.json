@@ -16,13 +16,15 @@
     "@tamagui/babel-plugin": "^2.5.1",
     "@types/react": "~19.2.2",
     "babel-preset-expo": "^57.0.4",
+    "react-doctor": "^0.9.1",
     "typescript": "~6.0.3"
   },
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "doctor": "npx react-doctor@latest"
   },
   "private": true,
   "overrides": {
