@@ -1,125 +1,70 @@
 # CLAUDE.md
 
-Behavioral guidelines for this project. Bias toward caution; judgment for trivial tasks.
+Guide for working in this repo. Bias toward the smallest change that works.
 
-## 1. Think Before Coding
+## What this is
 
-State assumptions. Surface tradeoffs. Don't hide confusion.
+A mobile ordering app. A guest browses a menu, customizes products with modifiers, fills a cart, and checks out with mock payment. Built mock-first so the UI runs before the backend exists.
 
-Before implementation:
-- Name your assumptions explicitly
-- If multiple interpretations exist, present all — don't pick silently
-- If a simpler approach exists, say so
-- If unclear, stop and ask
+Domain terms are defined once in `CONTEXT.md` — use them, don't drift to synonyms. Architecture decisions and their reasons live in `docs/adr/`.
 
-## 2. Simplicity First
+## First slice
 
-Minimum code that solves the problem. No speculation.
+Menu → Cart → Checkout, end-to-end on mocks. Everything else is deferred:
 
-- No features beyond what was asked
-- No abstractions for single-use code
-- No error handling for impossible scenarios
-- If 200 lines could be 50, rewrite it
+- **In:** menu, product modifiers, cart, guest checkout, mock payment (success + failure).
+- **Out (until asked):** auth, combos, loyalty, order history, live status, voice AI.
 
-Ask: "Would a senior engineer call this overcomplicated?" If yes, simplify.
+Don't build deferred features speculatively.
 
-## 3. Surgical Changes
+## Stack
 
-Touch only what you must. Clean up only your own mess.
+- Expo + React Native + TypeScript (strict). Read the versioned Expo docs (see `AGENTS.md`) before writing Expo code.
+- **Tamagui v2** for UI.
+- **React Navigation** in `navigation/` — not Expo Router (see ADR-0002).
+- **TanStack Query** for server data; **Zustand** for cart and local UI state.
+- **MSW** mocks at the network layer (see ADR-0001). One `ApiXService` per domain hits HTTP; MSW returns mock responses in dev. No Mock/Api class swap — production repoints the base URL.
+- React Hook Form + Zod for forms.
 
-When editing:
-- Don't improve adjacent code, comments, formatting
-- Don't refactor things that aren't broken
-- Match existing style, even if you'd do it differently
-
-When your changes make things unused:
-- Remove imports/variables/functions YOUR changes orphaned
-- Don't remove pre-existing dead code unless asked
-
-Test: Every changed line traces back to the user's request.
-
-## 4. Goal-Driven Execution
-
-Define success. Loop until verified.
-
-Transform requests into goals:
-- "Add validation" → test invalid inputs, make them pass
-- "Fix bug" → write test that reproduces it, make it pass
-- "Refactor X" → tests pass before and after
-
-For multi-step work, state a brief plan with checks:
+## Folder structure
 
 ```
-1. [Step] → verify: [check]
-2. [Step] → verify: [check]
+src/
+  api/ services/ mocks/ features/ components/ hooks/ store/ navigation/ types/ utils/
+tests/
 ```
 
-Strong criteria let you loop independently.
+## Testing
 
----
+Lean until a slice exists:
 
-## Writing Standards
+- **Unit (Jest):** price calc, cart logic — the real business logic.
+- **Component (RNTL):** the Menu → Cart → Checkout flow, including the payment-decline path.
+- Deferred: Detox E2E and the ≥80% coverage gate.
 
-All prose follows Orwell's 1946 rules. Technical terms stay exact.
+Test the logic worth breaking. No frameworks or fixtures beyond what a test needs.
 
-### Orwell's Rules (1946)
+## How to work
 
-1. **Never use a metaphor, simile, or figure of speech you see often in print.**
-   - Bad: "Think outside the box"
-   - Good: "Consider new approaches"
+1. **Think first.** Name assumptions. If a simpler approach exists, say so. If unclear, ask.
+2. **Simplest thing that works.** No abstractions for single-use code. No error handling for impossible cases. If 200 lines could be 50, write 50.
+3. **Surgical changes.** Touch only what the task needs. Don't refactor working code you happened to pass. Remove only what your own change orphaned.
+4. **Verify.** State success as a check and loop until it passes. "Fix bug" → write the failing test, make it green.
 
-2. **Never use a long word where a short one will do.**
-   - Bad: "utilize", "facilitate", "implement"
-   - Good: "use", "help", "build"
+## Prose
 
-3. **If it is possible to cut a word out, always cut it out.**
-   - Bad: "In order to track deliveries, we need..."
-   - Good: "To track deliveries, we need..."
+READMEs, comments, docs: short words, active voice, cut filler. A comment explains *why*, only when non-obvious. Would a delivery driver understand it?
 
-4. **Never use the passive where you can use the active.**
-   - Bad: "The delivery was tracked by the system"
-   - Good: "The system tracked the delivery"
+## Agent skills
 
-5. **Never use a foreign phrase, a scientific word, or a jargon word if you can think of an everyday English equivalent.**
-   - Bad: "utilize the GPS functionality for localization"
-   - Good: "track location with GPS"
+### Issue tracker
 
-6. **Break any of these rules sooner than say anything outright barbarous.**
-   - If following a rule makes prose unreadable, break it
+Issues tracked as GitHub issues in `sjunka/mobile-orders` (via `gh`). See `docs/agents/issue-tracker.md`.
 
-### How to apply
+### Triage labels
 
-Before publishing prose (README, comments, docs):
+Default five-role vocabulary. See `docs/agents/triage-labels.md`.
 
-1. Read it aloud — does it sound natural?
-2. Count words — shorter is better
-3. Check passive verbs — use active instead
-4. Remove filler ("very", "quite", "actually", "just")
-5. Replace jargon — would a delivery driver understand?
+### Domain docs
 
-Examples in this project:
-
-| Jargon | Simple |
-|--------|--------|
-| "asyncronous API calls with state management" | "fetch data while app stays responsive" |
-| "leverage the geolocation APIs" | "track driver location" |
-| "implement persistence via AsyncStorage" | "save data on device" |
-| "seamless offline-first architecture" | "works without network" |
-
----
-
-## Project-Specific
-
-**Tech stack:** React Native + Expo + TypeScript strict mode + Google Maps.
-
-**Scope:** Delivery tracking app. Three screens (list, details, map). Real-time GPS simulation. Offline support.
-
-**No tests required** — app runs on device; verification happens there. Good test would be: open app, tap delivery, watch GPS markers move on map every 2 seconds. That's the proof.
-
-**Code style:** Minimal comments. Names are clear. Only comment the "why" when non-obvious. Remove filler comments.
-
-**Architecture:** Services (deliveryService, notificationService) separate from screens. Types defined once. No magic numbers.
-
----
-
-**These guidelines work if:** changes are surgical (every line traces back to the request), code is readable (not over-engineered), and prose is clear (Orwell-compliant).
+Single-context — `CONTEXT.md` + `docs/adr/` at repo root. See `docs/agents/domain.md`.
