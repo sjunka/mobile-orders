@@ -13,9 +13,17 @@ import { handlers } from './handlers'
 
 export function enableMocks(): void {
   if (!__DEV__) return
-  console.log('[mocks] starting msw')
+  // MSW rebuilds every reply as `new Response(response.body, ...)`. React
+  // Native's Response has no `body` — the mock arrived with status 200 and an
+  // empty payload. Hand MSW the text instead; RN's Response takes that fine.
+  Object.defineProperty(Response.prototype, 'body', {
+    configurable: true,
+    get(this: { _bodyText?: string }) {
+      return this._bodyText ?? null
+    },
+  })
+
   setupServer(...handlers).listen({ onUnhandledRequest: 'error' })
-  console.log('[mocks] msw listening')
 }
 // ponytail: msw is a devDependency and now lands in every bundle. No prod build
 // exists yet (mock-first). When one lands, move msw to deps or strip this module
