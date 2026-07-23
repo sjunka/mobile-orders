@@ -1,11 +1,15 @@
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Button, ScrollView, Separator, Text, XStack, YStack } from 'tamagui'
 
+import type { RootStackParamList } from '../../navigation/types'
 import { useCart } from '../../store/cart'
 import type { CartLine } from '../../types/cart'
 import { cartTotal, formatPrice } from '../../utils/price'
 
 export function CartScreen() {
   const lines = useCart((s) => s.lines)
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   if (lines.length === 0) {
     return (
@@ -32,6 +36,10 @@ export function CartScreen() {
             {formatPrice(cartTotal(lines))}
           </Text>
         </XStack>
+
+        <Button theme="accent" onPress={() => navigation.navigate('Checkout')}>
+          Checkout
+        </Button>
       </YStack>
     </ScrollView>
   )

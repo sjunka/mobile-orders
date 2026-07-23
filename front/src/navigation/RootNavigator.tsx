@@ -2,6 +2,8 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack'
 import { Button } from 'tamagui'
 
 import { CartScreen } from '../features/cart/CartScreen'
+import { CheckoutScreen } from '../features/checkout/CheckoutScreen'
+import { ConfirmationScreen } from '../features/checkout/ConfirmationScreen'
 import { MenuScreen } from '../features/menu/MenuScreen'
 import { ProductDetailScreen } from '../features/menu/ProductDetailScreen'
 import { useCart } from '../store/cart'
@@ -35,6 +37,12 @@ export function RootNavigator() {
         options={({ route }) => ({ title: route.params.product.name })}
       />
       <Stack.Screen name="Cart" component={CartScreen} options={{ title: 'Cart' }} />
+      <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Checkout' }} />
+      <Stack.Screen
+        name="Confirmation"
+        component={ConfirmationScreen}
+        options={{ title: 'Confirmation', headerBackVisible: false }}
+      />
     </Stack.Navigator>
   )
 }

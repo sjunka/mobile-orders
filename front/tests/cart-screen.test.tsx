@@ -1,3 +1,4 @@
+import { NavigationContainer } from '@react-navigation/native'
 import { fireEvent, render, screen, waitFor } from '@testing-library/react-native'
 import { TamaguiProvider } from 'tamagui'
 
@@ -23,7 +24,9 @@ beforeEach(() => useCart.setState({ lines: [] }))
 function renderCart() {
   return render(
     <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
-      <CartScreen />
+      <NavigationContainer>
+        <CartScreen />
+      </NavigationContainer>
     </TamaguiProvider>,
   )
 }

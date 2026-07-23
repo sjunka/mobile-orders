@@ -9,6 +9,7 @@ type CartState = {
   addLine: (product: Product, modifiers: Modifier[], quantity: number) => void
   setQuantity: (lineId: string, quantity: number) => void
   removeLine: (lineId: string) => void
+  clear: () => void
 }
 
 function makeLine(product: Product, modifiers: Modifier[], quantity: number): CartLine {
@@ -45,4 +46,6 @@ export const useCart = create<CartState>((set) => ({
     })),
 
   removeLine: (lineId) => set((state) => ({ lines: state.lines.filter((l) => l.id !== lineId) })),
+
+  clear: () => set({ lines: [] }),
 }))

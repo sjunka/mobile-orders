@@ -1,8 +1,10 @@
 import type { Product } from '../types/menu'
+import type { Order } from '../types/order'
 
-// Screens grow as later tickets land (Checkout, Confirmation).
 export type RootStackParamList = {
   Menu: undefined
   ProductDetail: { product: Product }
   Cart: undefined
+  Checkout: undefined
+  Confirmation: Order
 }
