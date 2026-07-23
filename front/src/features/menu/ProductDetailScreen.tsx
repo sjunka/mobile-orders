@@ -3,14 +3,16 @@ import { useState } from 'react'
 import { Button, Separator, Text, XStack, YStack } from 'tamagui'
 
 import type { RootStackParamList } from '../../navigation/types'
+import { useCart } from '../../store/cart'
 import { formatPrice, linePrice } from '../../utils/price'
 
 type Props = NativeStackScreenProps<RootStackParamList, 'ProductDetail'>
 
-export function ProductDetailScreen({ route }: Props) {
+export function ProductDetailScreen({ route, navigation }: Props) {
   const { product } = route.params
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [quantity, setQuantity] = useState(1)
+  const addLine = useCart((s) => s.addLine)
 
   const selected = product.modifiers.filter((m) => selectedIds.has(m.id))
   const total = linePrice(product.basePrice, selected, quantity)
@@ -76,6 +78,16 @@ export function ProductDetailScreen({ route }: Props) {
       <Text testID="line-price" fontSize="$6" fontWeight="600">
         {formatPrice(total)}
       </Text>
+
+      <Button
+        theme="accent"
+        onPress={() => {
+          addLine(product, selected, quantity)
+          navigation.navigate('Cart')
+        }}
+      >
+        Add to cart
+      </Button>
     </YStack>
   )
 }
