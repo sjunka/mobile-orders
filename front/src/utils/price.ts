@@ -1,3 +1,4 @@
+import type { CartLine } from '../types/cart'
 import type { Modifier } from '../types/menu'
 
 /** Cents to a display string, e.g. 1250 -> "$12.50". */
@@ -9,4 +10,9 @@ export function formatPrice(cents: number): string {
 export function linePrice(basePrice: number, selected: Modifier[], quantity: number): number {
   const withMods = selected.reduce((sum, m) => sum + m.priceDelta, basePrice)
   return withMods * quantity
+}
+
+/** Cart total in cents: every line price added up. */
+export function cartTotal(lines: CartLine[]): number {
+  return lines.reduce((sum, line) => sum + line.price, 0)
 }
