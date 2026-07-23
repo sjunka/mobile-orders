@@ -1,5 +1,8 @@
+import { useNavigation } from '@react-navigation/native'
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Button, ScrollView, Spinner, Text, YStack } from 'tamagui'
 
+import type { RootStackParamList } from '../../navigation/types'
 import type { Product } from '../../types/menu'
 import { formatPrice } from '../../utils/price'
 import { useMenu } from './useMenu'
@@ -36,6 +39,7 @@ export function MenuScreen() {
 }
 
 function ProductRow({ product }: { product: Product }) {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   return (
     <YStack
       gap="$1"
@@ -43,6 +47,9 @@ function ProductRow({ product }: { product: Product }) {
       borderWidth={1}
       borderColor="$borderColor"
       rounded="$4"
+      pressStyle={{ opacity: 0.6 }}
+      onPress={() => navigation.navigate('ProductDetail', { product })}
+      accessibilityRole="button"
     >
       <Text fontWeight="600">{product.name}</Text>
       <Text color="$color10">{formatPrice(product.basePrice)}</Text>
