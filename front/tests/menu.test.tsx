@@ -1,3 +1,4 @@
+import { NavigationContainer } from '@react-navigation/native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { fireEvent, render, screen } from '@testing-library/react-native'
 import { delay, http, HttpResponse } from 'msw'
@@ -14,7 +15,9 @@ function renderMenu() {
   return render(
     <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
       <QueryClientProvider client={client}>
-        <MenuScreen />
+        <NavigationContainer>
+          <MenuScreen />
+        </NavigationContainer>
       </QueryClientProvider>
     </TamaguiProvider>,
   )
