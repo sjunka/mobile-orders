@@ -25,9 +25,12 @@ One seam: supertest over the built application. There are no per-service unit sp
 
 ## Endpoints
 
-| Method | Path    | Returns                  |
-| ------ | ------- | ------------------------ |
-| `GET`  | `/menu` | Every product on sale    |
+| Method | Path      | Returns                                             |
+| ------ | --------- | --------------------------------------------------- |
+| `GET`  | `/menu`   | Every product on sale                                |
+| `POST` | `/orders` | `{ orderId, total }` for a paid order                |
+
+`POST /orders` takes `{ name, email, cardNumber, lines: [{ productId, modifierIds, quantity }] }`. No price field exists in the request — the server prices the lines against the menu itself (ADR-0002). A card ending `0002` is declined with `402` and the message `Your card was declined.`; every refusal answers with one readable `message` string, never a field-error list.
 
 ## The menu is owned here
 

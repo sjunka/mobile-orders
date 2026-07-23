@@ -1,10 +1,20 @@
-/** What checkout sends to the payment service. Total is in cents. */
-export type PaymentRequest = {
+/**
+ * One line of an order as the server wants it: references only, no price. The
+ * server prices it against its own menu — see `back/docs/adr/0002`.
+ */
+export type OrderLineRequest = {
+  productId: string
+  modifierIds: string[]
+  quantity: number
+}
+
+/** What checkout sends to create an order. Carries no total, by design. */
+export type CreateOrderRequest = {
   name: string
   email: string
   cardNumber: string
-  total: number
+  lines: OrderLineRequest[]
 }
 
-/** A paid order. Declines come back as an error, not a status. */
+/** A paid order, priced by the server. Declines come back as an error, not a status. */
 export type Order = { orderId: string; total: number }
