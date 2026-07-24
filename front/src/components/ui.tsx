@@ -1,3 +1,5 @@
+// Every image here is a bundled `require()` asset, so expo-image's caching buys nothing.
+// react-doctor-disable-next-line react-doctor/rn-prefer-expo-image
 import { Image, Platform, StyleSheet, type ImageSourcePropType } from 'react-native'
 import { Button, styled, Text, View, YStack } from 'tamagui'
 
