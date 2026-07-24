@@ -2,20 +2,22 @@ import { http, HttpResponse } from 'msw'
 
 import { API_URL } from '../api/client'
 import type { CreateOrderRequest, OrderLineRequest } from '../types/order'
+import { linePrice } from '../utils/price'
 import { menu } from './menu-data'
 
-/** Mirrors the server: (base + Σ deltas) × quantity. Throws on an unknown reference. */
+/** Mirrors the server: resolve the references, then price them. Throws on an unknown one. */
 function priceLine(line: OrderLineRequest): number {
   const product = menu.find((p) => p.id === line.productId)
   if (!product) throw new Error('Something you ordered is no longer on the menu.')
 
-  const withModifiers = line.modifierIds.reduce((price, modifierId) => {
+  const modifiers = line.modifierIds.map((modifierId) => {
     const modifier = product.modifiers.find((m) => m.id === modifierId)
-    if (!modifier) throw new Error(`We could not find one of the options you chose for ${product.name}.`)
-    return price + modifier.priceDelta
-  }, product.basePrice)
+    if (!modifier)
+      throw new Error(`We could not find one of the options you chose for ${product.name}.`)
+    return modifier
+  })
 
-  return withModifiers * line.quantity
+  return linePrice(product.basePrice, modifiers, line.quantity)
 }
 
 export const handlers = [

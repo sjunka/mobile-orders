@@ -1,7 +1,6 @@
 import { NavigationContainer } from '@react-navigation/native'
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { StatusBar } from 'expo-status-bar'
-import { useColorScheme } from 'react-native'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { TamaguiProvider } from 'tamagui'
 
@@ -11,10 +10,9 @@ import { tamaguiConfig } from './tamagui.config'
 const queryClient = new QueryClient()
 
 export default function App() {
-  const colorScheme = useColorScheme()
-
   return (
-    <TamaguiProvider config={tamaguiConfig} defaultTheme={colorScheme ?? 'light'}>
+    // Cream canvas only — no dark theme designed yet (DESIGN-claude.md).
+    <TamaguiProvider config={tamaguiConfig} defaultTheme="light">
       <QueryClientProvider client={queryClient}>
         <SafeAreaProvider>
           <NavigationContainer>
@@ -22,7 +20,7 @@ export default function App() {
           </NavigationContainer>
         </SafeAreaProvider>
       </QueryClientProvider>
-      <StatusBar style="auto" />
+      <StatusBar style="dark" />
     </TamaguiProvider>
   )
 }

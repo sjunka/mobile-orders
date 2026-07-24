@@ -2,9 +2,11 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useMutation } from '@tanstack/react-query'
 import { Controller, useForm, type Control } from 'react-hook-form'
-import { Button, Input, Separator, Text, YStack } from 'tamagui'
+import { Input, ScrollView, XStack, YStack } from 'tamagui'
 import { z } from 'zod'
 
+import { Body, Card, Display, Hero, PrimaryButton, Screen } from '../../components/ui'
+import { checkoutDefaults } from '../../mocks/guest'
 import type { RootStackParamList } from '../../navigation/types'
 import { createOrder, toOrderLines } from '../../services/order'
 import { useCart } from '../../store/cart'
@@ -28,50 +30,68 @@ export function CheckoutScreen({ navigation }: Props) {
 
   const { control, handleSubmit } = useForm<Fields>({
     resolver: zodResolver(schema),
-    defaultValues: { name: '', email: '', cardNumber: '' },
+    defaultValues: checkoutDefaults(),
   })
 
-  const payment = useMutation({
+  const checkout = useMutation({
     mutationFn: (fields: Fields) => createOrder({ ...fields, lines: toOrderLines(lines) }),
     onSuccess: (order) => {
       // Replace, so the back gesture can't land on a checkout for a paid order.
       navigation.replace('Confirmation', order)
       clear() // after the swap, or Checkout re-renders as "Pay $0.00" first
-
     },
   })
 
   return (
-    <YStack flex={1} gap="$4" p="$4">
-      <Field control={control} name="name" label="Name" autoComplete="name" />
-      <Field
-        control={control}
-        name="email"
-        label="Email"
-        autoComplete="email"
-        keyboardType="email-address"
-        autoCapitalize="none"
-      />
-      <Field
-        control={control}
-        name="cardNumber"
-        label="Card number"
-        autoComplete="cc-number"
-        keyboardType="number-pad"
-      />
+    <Screen>
+      <ScrollView flex={1} contentContainerStyle={{ pb: 20 }}>
+        <Hero
+          eyebrow="Last step"
+          title="Almost there"
+          subtitle="Where should we send the receipt?"
+          image={require('../../../assets/ui/hero-checkout.png')}
+          height={170}
+        />
 
-      <Separator />
+        <Card gap={16} p={20} m={16}>
+          <Field control={control} name="name" label="Name" autoComplete="name" />
+          <Field
+            control={control}
+            name="email"
+            label="Email"
+            autoComplete="email"
+            keyboardType="email-address"
+            autoCapitalize="none"
+          />
+          <Field
+            control={control}
+            name="cardNumber"
+            label="Card number"
+            autoComplete="cc-number"
+            keyboardType="number-pad"
+          />
+        </Card>
 
-      {payment.isError && <Text color="$red10">{payment.error.message}</Text>}
+        {checkout.isError && (
+          <Body tone="error" px={16}>
+            {checkout.error.message}
+          </Body>
+        )}
+      </ScrollView>
 
-      <Button
-        theme="accent"
-        disabled={payment.isPending}
-        onPress={handleSubmit((fields) => payment.mutate(fields))}
-      >
-        {`Pay ${formatPrice(total)}`}
-      </Button>
-    </YStack>
+      <YStack p={16} pb={28} gap={12} borderTopWidth={1} borderColor="$hairline" bg="$canvas">
+        <XStack justify="space-between" items="center">
+          <Body tone="muted">Total</Body>
+          <Display size="md">{formatPrice(total)}</Display>
+        </XStack>
+        <PrimaryButton
+          disabled={checkout.isPending}
+          onPress={handleSubmit((fields) => checkout.mutate(fields))}
+        >
+          {`Pay ${formatPrice(total)}`}
+        </PrimaryButton>
+      </YStack>
+    </Screen>
   )
 }
 
@@ -79,10 +99,7 @@ type FieldProps = {
   control: Control<Fields>
   name: keyof Fields
   label: string
-} & Pick<
-  React.ComponentProps<typeof Input>,
-  'autoComplete' | 'keyboardType' | 'autoCapitalize'
->
+} & Pick<React.ComponentProps<typeof Input>, 'autoComplete' | 'keyboardType' | 'autoCapitalize'>
 
 function Field({ control, name, label, ...inputProps }: FieldProps) {
   return (
@@ -90,16 +107,29 @@ function Field({ control, name, label, ...inputProps }: FieldProps) {
       control={control}
       name={name}
       render={({ field, fieldState }) => (
-        <YStack gap="$2">
-          <Text>{label}</Text>
+        <YStack gap={6}>
+          <Body small strong>
+            {label}
+          </Body>
           <Input
             accessibilityLabel={label}
             value={field.value}
             onChangeText={field.onChange}
             onBlur={field.onBlur}
+            bg="$canvas"
+            color="$ink"
+            height={44}
+            rounded={8}
+            borderWidth={1}
+            borderColor={fieldState.error ? '$error' : '$hairline'}
+            focusStyle={{ borderColor: '$coral' }}
             {...inputProps}
           />
-          {fieldState.error && <Text color="$red10">{fieldState.error.message}</Text>}
+          {fieldState.error && (
+            <Body small tone="error">
+              {fieldState.error.message}
+            </Body>
+          )}
         </YStack>
       )}
     />
