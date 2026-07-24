@@ -4,7 +4,7 @@ const mswPackages = require('./jest.msw-packages')
 // Extend jest-expo's default ignore list with the ESM packages this app pulls in
 // (some of MSW's deps ship ESM-only and must be transformed, not skipped).
 const [rnIgnore, ...restIgnore] = expoPreset.transformIgnorePatterns
-const extra = ['tamagui', '@tamagui', '@tanstack', 'react-native-url-polyfill', ...mswPackages].join('|')
+const extra = ['tamagui', '@tamagui', '@tanstack', ...mswPackages].join('|')
 
 // MSW's runtime deps ship as .mjs, which expo's transform regex doesn't match.
 const babelTransform = expoPreset.transform['\\.[jt]sx?$']
