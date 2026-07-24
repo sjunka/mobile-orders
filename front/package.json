@@ -37,6 +37,7 @@
     "typescript": "~6.0.3"
   },
   "scripts": {
+    "me": "npm run start:dev --prefix ../back & npm start & wait",
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
