@@ -7,6 +7,7 @@ import type { RootStackParamList } from '../../navigation/types'
 import type { Product } from '../../types/menu'
 import { formatPrice } from '../../utils/price'
 import { useMenu } from './useMenu'
+import { VoiceButton } from './VoiceButton'
 
 export function MenuScreen() {
   const { data: menu, isPending, isError, refetch } = useMenu()
@@ -37,6 +38,10 @@ export function MenuScreen() {
           subtitle="Pick something, make it yours."
           image={require('../../../assets/ui/hero-menu.png')}
         />
+
+        <YStack px={16} pt={16}>
+          <VoiceButton menu={menu} />
+        </YStack>
 
         <YStack gap={12} p={16}>
           {menu.map((product) => (

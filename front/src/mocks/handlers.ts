@@ -27,6 +27,10 @@ const placed: OperatorOrder[] = []
 export const handlers = [
   http.get(`${API_URL}/menu`, () => HttpResponse.json(menu)),
 
+  // Real backend transcribes and matches; the mock has nothing to match against,
+  // so it resolves nothing. Tests that need matched lines override this.
+  http.post(`${API_URL}/utterances`, () => HttpResponse.json({ lines: [], unresolved: [] })),
+
   http.get(`${API_URL}/orders`, () => HttpResponse.json(placed)),
 
   // Mirrors POST /orders: the server prices the lines, then charges. A card
