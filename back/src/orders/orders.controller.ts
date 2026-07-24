@@ -26,11 +26,13 @@ export class OrdersController {
 
   // For verifying what the server recorded. The app never calls this.
   @Get(':orderId')
-  find(@Param('orderId') orderId: string): Order {
+  find(@Param('orderId') orderId: string): Omit<Order, 'guest'> {
     const order = this.ordersService.find(orderId);
     if (!order) {
       throw new NotFoundException('We could not find that order.');
     }
-    return order;
+    // No caller identity (ADR-0001) and ids run in sequence, so the guest stays
+    // out of the response — anyone could count their way to this route.
+    return { orderId: order.orderId, total: order.total, lines: order.lines };
   }
 }

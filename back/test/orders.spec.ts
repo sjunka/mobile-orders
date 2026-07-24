@@ -182,19 +182,15 @@ describe('/orders', () => {
 
     const fetched = await get(orderId).expect(200);
 
-    expect(fetched.body).toEqual({
-      orderId,
-      guest: { name: GUEST.name, email: GUEST.email },
-      total,
-      lines,
-    });
+    // No guest: nothing identifies the caller, so nothing identifying comes back.
+    expect(fetched.body).toEqual({ orderId, total, lines });
   });
 
   it('answers an id that was never issued with one readable sentence', async () => {
-    const response = await get('ORD-nope').expect(404);
-    const { message } = response.body as { message: unknown };
+    const response = await get('never-issued').expect(404);
 
-    expect(typeof message).toBe('string');
-    expect(message as string).toMatch(/\.$/);
+    expect((response.body as { message: unknown }).message).toBe(
+      'We could not find that order.',
+    );
   });
 });
