@@ -11,7 +11,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated'
-import { Text, View } from 'tamagui'
+import { Text, View, XStack } from 'tamagui'
 
 import { claudeColors } from '../../tamagui.config'
 import { CartIcon } from '../components/ui'
@@ -20,6 +20,7 @@ import { CheckoutScreen } from '../features/checkout/CheckoutScreen'
 import { ConfirmationScreen } from '../features/checkout/ConfirmationScreen'
 import { MenuScreen } from '../features/menu/MenuScreen'
 import { ProductDetailScreen } from '../features/menu/ProductDetailScreen'
+import { OrdersScreen } from '../features/orders/OrdersScreen'
 import { useCart } from '../store/cart'
 import type { RootStackParamList } from './types'
 
@@ -118,7 +119,22 @@ export function RootNavigator() {
         component={MenuScreen}
         options={({ navigation }) => ({
           title: 'Menu',
-          headerRight: () => <CartButton onPress={() => navigation.navigate('Cart')} />,
+          headerRight: () => (
+            <XStack items="center" gap={16}>
+              {/* No auth, so any guest can open the operator list. See back ADR-0003. */}
+              <Text
+                onPress={() => navigation.navigate('Orders')}
+                accessibilityRole="button"
+                accessibilityLabel="Orders"
+                color="$ink"
+                fontSize={16}
+                pressStyle={{ opacity: 0.6 }}
+              >
+                Orders
+              </Text>
+              <CartButton onPress={() => navigation.navigate('Cart')} />
+            </XStack>
+          ),
         })}
       />
       <Stack.Screen
@@ -127,6 +143,7 @@ export function RootNavigator() {
         options={({ route }) => ({ title: route.params.product.name })}
       />
       <Stack.Screen name="Cart" component={CartScreen} options={{ title: 'Cart' }} />
+      <Stack.Screen name="Orders" component={OrdersScreen} options={{ title: 'Orders' }} />
       <Stack.Screen name="Checkout" component={CheckoutScreen} options={{ title: 'Checkout' }} />
       <Stack.Screen
         name="Confirmation"

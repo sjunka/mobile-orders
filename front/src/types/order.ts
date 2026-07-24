@@ -18,3 +18,15 @@ export type CreateOrderRequest = {
 
 /** A paid order, priced by the server. Declines come back as an error, not a status. */
 export type Order = { orderId: string; total: number }
+
+/**
+ * An order as the operator list returns it: guest identity included, lines still
+ * references only. Unauthenticated — see `back/docs/adr/0003`.
+ */
+export type OperatorOrder = {
+  orderId: string
+  guest: { name: string; email: string }
+  total: number
+  lines: OrderLineRequest[]
+  status: 'paid'
+}

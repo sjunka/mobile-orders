@@ -166,6 +166,7 @@ describe('/orders', () => {
       guest: { name: GUEST.name, email: GUEST.email },
       total: 1100,
       lines: [{ productId: 'fries', modifierIds: ['large'], quantity: 2 }],
+      status: 'paid',
     });
   });
 
@@ -183,7 +184,57 @@ describe('/orders', () => {
     const fetched = await get(orderId).expect(200);
 
     // No guest: nothing identifies the caller, so nothing identifying comes back.
-    expect(fetched.body).toEqual({ orderId, total, lines });
+    expect(fetched.body).toEqual({ orderId, total, lines, status: 'paid' });
+  });
+
+  // The operator list. Other tests in this file have already filled the store,
+  // so this asserts on its own two orders, not on the whole list.
+  it('lists every order with its guest and a paid status', async () => {
+    const first = await post({
+      ...GUEST,
+      name: 'Grace Hopper',
+      email: 'grace@example.com',
+      lines: [{ productId: 'fries', modifierIds: [], quantity: 1 }],
+    }).expect(201);
+    const second = await post({
+      ...GUEST,
+      name: 'Alan Turing',
+      email: 'alan@example.com',
+      lines: [{ productId: 'soda', modifierIds: [], quantity: 2 }],
+    }).expect(201);
+
+    const listed = await request(app.getHttpServer())
+      .get('/orders')
+      .expect(200);
+    const orders = listed.body as {
+      orderId: string;
+      guest: { name: string; email: string };
+      total: number;
+      lines: unknown[];
+      status: string;
+    }[];
+
+    const ids = [first, second].map(
+      (r) => (r.body as { orderId: string }).orderId,
+    );
+    const [grace, alan] = ids.map((id) =>
+      orders.find((order) => order.orderId === id),
+    );
+
+    expect(grace).toEqual({
+      orderId: ids[0],
+      guest: { name: 'Grace Hopper', email: 'grace@example.com' },
+      total: 400,
+      lines: [{ productId: 'fries', modifierIds: [], quantity: 1 }],
+      status: 'paid',
+    });
+    expect(alan).toEqual({
+      orderId: ids[1],
+      guest: { name: 'Alan Turing', email: 'alan@example.com' },
+      total: 600,
+      lines: [{ productId: 'soda', modifierIds: [], quantity: 2 }],
+      status: 'paid',
+    });
   });
 
   it('answers an id that was never issued with one readable sentence', async () => {

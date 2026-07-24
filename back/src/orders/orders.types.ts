@@ -23,10 +23,14 @@ export type CreateOrder = {
 /**
  * A priced, paid order belonging to one guest. `total` is integer cents,
  * computed by the server. The card number is never kept.
+ *
+ * `status` is `paid` from creation: the charge runs before the order exists, so
+ * an unpaid one is unrepresentable. It widens when cancellation lands.
  */
 export type Order = {
   orderId: string;
   guest: Guest;
   total: number;
   lines: OrderLine[];
+  status: 'paid';
 };

@@ -32,6 +32,7 @@ export class OrdersService {
       guest: request.guest,
       total,
       lines: request.lines,
+      status: 'paid',
     };
     this.orders.set(order.orderId, order);
     return order;
@@ -39,6 +40,11 @@ export class OrdersService {
 
   find(orderId: string): Order | undefined {
     return this.orders.get(orderId);
+  }
+
+  /** Every order the backend holds, oldest first. For the operator list. */
+  findAll(): Order[] {
+    return [...this.orders.values()];
   }
 
   /** (base price + Σ modifier deltas) × quantity, in integer cents. */

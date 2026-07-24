@@ -36,6 +36,10 @@ _Avoid_: Purchase, transaction, receipt
 A person ordering without an account. Identity is collected at checkout, not via login.
 _Avoid_: User, customer, account
 
+**Operator**:
+Whoever runs the shop. Sees every order, may cancel any of them. Unauthenticated in this prototype — the Orders screen is a header button on the Menu that any guest can tap.
+_Avoid_: Admin, staff, manager
+
 **Payment**:
 The mock charge run at checkout. Succeeds or is declined based on the input.
 A card number ending in `0002` is declined (e.g. `4000000000000002`); any other
