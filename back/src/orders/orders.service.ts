@@ -13,6 +13,7 @@ export class OrdersService {
   // ponytail: in-memory, so orders die with the process. Swap for a repository
   // call when a database lands — callers only ever see `create` and `find`.
   private readonly orders = new Map<string, Order>();
+  private nextOrderNumber = 1;
 
   constructor(private readonly menuService: MenuService) {}
 
@@ -27,7 +28,8 @@ export class OrdersService {
     this.charge(request.cardNumber);
 
     const order: Order = {
-      orderId: `ORD-${this.orders.size + 1}-${Date.now()}`,
+      orderId: `ORD-${this.nextOrderNumber++}`,
+      guest: request.guest,
       total,
       lines: request.lines,
     };

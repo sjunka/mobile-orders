@@ -1,7 +1,16 @@
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
 import { useState } from 'react'
-import { Button, Separator, Text, XStack, YStack } from 'tamagui'
+import { ScrollView, XStack, YStack } from 'tamagui'
 
+import {
+  Body,
+  Card,
+  Display,
+  Hero,
+  PrimaryButton,
+  SecondaryButton,
+  Screen,
+} from '../../components/ui'
 import type { RootStackParamList } from '../../navigation/types'
 import { useCart } from '../../store/cart'
 import { formatPrice, linePrice } from '../../utils/price'
@@ -25,71 +34,99 @@ export function ProductDetailScreen({ route, navigation }: Props) {
     })
 
   return (
-    <YStack flex={1} gap="$4" p="$4">
-      <YStack gap="$1">
-        <Text fontSize="$6" fontWeight="600">
-          {product.name}
-        </Text>
-        <Text color="$color10">{formatPrice(product.basePrice)}</Text>
-      </YStack>
+    <Screen>
+      <ScrollView flex={1} contentContainerStyle={{ pb: 24 }}>
+        <Hero
+          eyebrow="On the menu"
+          title={product.name}
+          subtitle={formatPrice(product.basePrice)}
+          image={require('../../../assets/ui/hero-product.png')}
+          height={170}
+        />
 
-      <YStack gap="$2">
-        {product.modifiers.map((m) => {
-          const on = selectedIds.has(m.id)
-          return (
-            <Button
-              key={m.id}
-              onPress={() => toggle(m.id)}
-              bg={on ? '$color5' : undefined}
-              accessibilityRole="checkbox"
-              accessibilityState={{ checked: on }}
-            >
-              <XStack flex={1} justify="space-between">
-                <Text>{m.label}</Text>
-                <Text>{formatDelta(m.priceDelta)}</Text>
-              </XStack>
-            </Button>
-          )
-        })}
-      </YStack>
+        {product.modifiers.length > 0 && (
+          <YStack gap={10} p={16}>
+            <Body small tone="soft" letterSpacing={1.5}>
+              EXTRAS
+            </Body>
+            {product.modifiers.map((m) => {
+              const on = selectedIds.has(m.id)
+              return (
+                <Card
+                  key={m.id}
+                  onPress={() => toggle(m.id)}
+                  accessibilityRole="checkbox"
+                  accessibilityState={{ checked: on }}
+                  bg={on ? '$coral' : '$surfaceCard'}
+                  pressStyle={{ opacity: 0.85 }}
+                  p={14}
+                >
+                  <XStack justify="space-between" items="center">
+                    <Body strong color={on ? '$onPrimary' : '$ink'}>
+                      {m.label}
+                    </Body>
+                    <Body small color={on ? '$onPrimary' : '$muted'}>
+                      {formatDelta(m.priceDelta)}
+                    </Body>
+                  </XStack>
+                </Card>
+              )
+            })}
+          </YStack>
+        )}
 
-      <XStack items="center" gap="$4">
-        <Text>Quantity</Text>
-        <Button
-          circular
-          onPress={() => setQuantity((q) => Math.max(1, q - 1))}
-          disabled={quantity === 1}
-          accessibilityLabel="Decrease quantity"
-        >
-          −
-        </Button>
-        <Text fontSize="$5">{quantity}</Text>
-        <Button
-          circular
-          onPress={() => setQuantity((q) => q + 1)}
-          accessibilityLabel="Increase quantity"
-        >
-          +
-        </Button>
-      </XStack>
+        <XStack items="center" gap={16} px={16} pt={8}>
+          <Body strong flex={1}>
+            Quantity
+          </Body>
+          <SecondaryButton
+            circular
+            size="$3"
+            onPress={() => setQuantity((q) => Math.max(1, q - 1))}
+            disabled={quantity === 1}
+            accessibilityLabel="Decrease quantity"
+          >
+            −
+          </SecondaryButton>
+          <Display size="sm" width={28} text="center">
+            {quantity}
+          </Display>
+          <SecondaryButton
+            circular
+            size="$3"
+            onPress={() => setQuantity((q) => q + 1)}
+            accessibilityLabel="Increase quantity"
+          >
+            +
+          </SecondaryButton>
+        </XStack>
+      </ScrollView>
 
-      <Separator />
-
-      <Text testID="line-price" fontSize="$6" fontWeight="600">
-        {formatPrice(total)}
-      </Text>
-
-      <Button
-        theme="accent"
-        onPress={() => {
-          addLine(product, selected, quantity)
-          // Back to the menu so the guest keeps shopping; the header shows the count.
-          navigation.goBack()
-        }}
+      <YStack
+        p={16}
+        gap={12}
+        borderTopWidth={1}
+        borderColor="$hairline"
+        bg="$canvas"
+        pb={28}
       >
-        Add to cart
-      </Button>
-    </YStack>
+        <XStack justify="space-between" items="center">
+          <Body tone="muted">Total</Body>
+          <Display testID="line-price" size="md">
+            {formatPrice(total)}
+          </Display>
+        </XStack>
+        <PrimaryButton
+          onPress={() => {
+            addLine(product, selected, quantity)
+            // Back to the menu so the guest keeps shopping; the header shows the count.
+            navigation.goBack()
+          }}
+        >
+          Add to cart
+        </PrimaryButton>
+      </YStack>
+    </Screen>
   )
 }
 

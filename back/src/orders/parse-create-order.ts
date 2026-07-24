@@ -70,5 +70,9 @@ export function parseCreateOrder(body: unknown): CreateOrder {
     refuse('Your order is empty.');
   }
 
-  return { name, email, cardNumber, lines: lines.map(parseLine) };
+  return {
+    guest: { name, email },
+    cardNumber,
+    lines: lines.map(parseLine),
+  };
 }

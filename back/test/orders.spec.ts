@@ -141,7 +141,9 @@ describe('POST /orders', () => {
     }
   });
 
-  it('records the order it created, with its lines and total', async () => {
+  // The one assertion that steps off the HTTP seam: what a guest bought is
+  // recorded, and nothing over HTTP can show that.
+  it('records the order it created, with its guest, lines and total', async () => {
     const response = await post({
       ...GUEST,
       lines: [{ productId: 'fries', modifierIds: ['large'], quantity: 2 }],
@@ -157,6 +159,7 @@ describe('POST /orders', () => {
     // and nobody else's.
     expect(app.get(OrdersService).find(orderId)).toEqual({
       orderId,
+      guest: { name: GUEST.name, email: GUEST.email },
       total: 1100,
       lines: [{ productId: 'fries', modifierIds: ['large'], quantity: 2 }],
     });
