@@ -47,4 +47,15 @@ export class OrdersController {
       status: order.status,
     };
   }
+
+  // One-way: cancelling is a POST action, not a DELETE — the order stays on
+  // record. Idempotent, so a double tap or a retry never errors.
+  @Post(':orderId/cancel')
+  cancel(@Param('orderId') orderId: string): Order {
+    const order = this.ordersService.cancel(orderId);
+    if (!order) {
+      throw new NotFoundException('We could not find that order.');
+    }
+    return order;
+  }
 }

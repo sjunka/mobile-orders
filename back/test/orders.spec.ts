@@ -38,6 +38,10 @@ describe('/orders', () => {
     return request(app.getHttpServer()).get(`/orders/${orderId}`);
   }
 
+  function cancel(orderId: string) {
+    return request(app.getHttpServer()).post(`/orders/${orderId}/cancel`);
+  }
+
   it('prices a single plain line from the menu', async () => {
     const response = await post({
       ...GUEST,
@@ -243,5 +247,58 @@ describe('/orders', () => {
     expect((response.body as { message: unknown }).message).toBe(
       'We could not find that order.',
     );
+  });
+
+  it('cancels a paid order, flipping its status', async () => {
+    const created = await post({
+      ...GUEST,
+      lines: [{ productId: 'fries', modifierIds: [], quantity: 1 }],
+    }).expect(201);
+    const { orderId } = created.body as { orderId: string };
+
+    const response = await cancel(orderId).expect(201);
+    expect((response.body as { status: string }).status).toBe('cancelled');
+
+    const fetched = await get(orderId).expect(200);
+    expect((fetched.body as { status: string }).status).toBe('cancelled');
+  });
+
+  it('cancelling an already-cancelled order is a no-op success', async () => {
+    const created = await post({
+      ...GUEST,
+      lines: [{ productId: 'fries', modifierIds: [], quantity: 1 }],
+    }).expect(201);
+    const { orderId } = created.body as { orderId: string };
+
+    await cancel(orderId).expect(201);
+    const second = await cancel(orderId).expect(201);
+
+    expect((second.body as { status: string }).status).toBe('cancelled');
+  });
+
+  it('answers a cancel of an unknown order id with a not-found', async () => {
+    const response = await cancel('never-issued').expect(404);
+
+    expect((response.body as { message: unknown }).message).toBe(
+      'We could not find that order.',
+    );
+  });
+
+  it('cancelling one order leaves a sibling order untouched', async () => {
+    const first = await post({
+      ...GUEST,
+      lines: [{ productId: 'fries', modifierIds: [], quantity: 1 }],
+    }).expect(201);
+    const second = await post({
+      ...GUEST,
+      lines: [{ productId: 'soda', modifierIds: [], quantity: 1 }],
+    }).expect(201);
+    const { orderId: firstId } = first.body as { orderId: string };
+    const { orderId: secondId } = second.body as { orderId: string };
+
+    await cancel(firstId).expect(201);
+
+    const untouched = await get(secondId).expect(200);
+    expect((untouched.body as { status: string }).status).toBe('paid');
   });
 });

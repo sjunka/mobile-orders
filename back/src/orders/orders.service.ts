@@ -47,6 +47,16 @@ export class OrdersService {
     return [...this.orders.values()];
   }
 
+  /** Flips an order to cancelled. Idempotent — cancelling twice just repeats it. */
+  cancel(orderId: string): Order | undefined {
+    const order = this.orders.get(orderId);
+    if (!order) {
+      return undefined;
+    }
+    order.status = 'cancelled';
+    return order;
+  }
+
   /** (base price + Σ modifier deltas) × quantity, in integer cents. */
   private priceLine(line: OrderLine): number {
     const product = this.menuService

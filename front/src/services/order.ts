@@ -16,6 +16,11 @@ export function listOrders(): Promise<OperatorOrder[]> {
   return apiGet<OperatorOrder[]>('/orders')
 }
 
+/** One-way: no un-cancel. Idempotent — cancelling twice returns the same order. */
+export function cancelOrder(orderId: string): Promise<OperatorOrder> {
+  return apiPost<OperatorOrder>(`/orders/${orderId}/cancel`, {})
+}
+
 /** A cart line, stripped down to the references the server prices. */
 export function toOrderLines(lines: CartLine[]): OrderLineRequest[] {
   return lines.map((line) => ({
