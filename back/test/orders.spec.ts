@@ -14,7 +14,7 @@ const GUEST = {
 
 const DECLINED_CARD = '4000000000000002';
 
-describe('POST /orders', () => {
+describe('/orders', () => {
   let app: INestApplication<App>;
 
   beforeAll(async () => {
@@ -32,6 +32,10 @@ describe('POST /orders', () => {
 
   function post(body: object) {
     return request(app.getHttpServer()).post('/orders').send(body);
+  }
+
+  function get(orderId: string) {
+    return request(app.getHttpServer()).get(`/orders/${orderId}`);
   }
 
   it('prices a single plain line from the menu', async () => {
@@ -163,5 +167,34 @@ describe('POST /orders', () => {
       total: 1100,
       lines: [{ productId: 'fries', modifierIds: ['large'], quantity: 2 }],
     });
+  });
+
+  it('reads back an order it created, with its lines and total', async () => {
+    const lines = [
+      { productId: 'burger', modifierIds: ['cheese'], quantity: 2 },
+      { productId: 'soda', modifierIds: [], quantity: 1 },
+    ];
+    const created = await post({ ...GUEST, lines }).expect(201);
+    const { orderId, total } = created.body as {
+      orderId: string;
+      total: number;
+    };
+
+    const fetched = await get(orderId).expect(200);
+
+    expect(fetched.body).toEqual({
+      orderId,
+      guest: { name: GUEST.name, email: GUEST.email },
+      total,
+      lines,
+    });
+  });
+
+  it('answers an id that was never issued with one readable sentence', async () => {
+    const response = await get('ORD-nope').expect(404);
+    const { message } = response.body as { message: unknown };
+
+    expect(typeof message).toBe('string');
+    expect(message as string).toMatch(/\.$/);
   });
 });
