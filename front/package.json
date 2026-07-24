@@ -48,6 +48,7 @@
   },
   "private": true,
   "overrides": {
-    "@tamagui/web": "2.5.1"
+    "@tamagui/web": "2.5.1",
+    "react-native-worklets": "0.10.0"
   }
 }
