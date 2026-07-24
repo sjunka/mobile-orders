@@ -75,8 +75,10 @@ export const SecondaryButton = styled(Button, {
 
 /** Small pill label. `coral` for the loud variant. */
 export const Badge = styled(Text, {
-  bg: '$surfaceCard',
-  color: '$ink',
+  bg: '$coralSoft',
+  color: '$coralActive',
+  borderWidth: 1,
+  borderColor: '$coral',
   fontSize: 13,
   fontWeight: '500',
   rounded: 9999,

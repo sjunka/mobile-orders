@@ -6,6 +6,7 @@ const palette = {
   coral: '#cc785c',
   coralActive: '#a9583e',
   coralDisabled: '#e6dfd8',
+  coralSoft: '#f6e7e0',
   ink: '#141413',
   bodyText: '#3d3d3a',
   muted: '#6c6a64',

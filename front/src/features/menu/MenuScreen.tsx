@@ -66,9 +66,7 @@ function ProductRow({ product }: { product: Product }) {
       {product.modifiers.length > 0 && (
         <XStack gap={6} flexWrap="wrap" mt={4}>
           {product.modifiers.map((m) => (
-            <Badge key={m.id} bg="$canvas">
-              {m.label}
-            </Badge>
+            <Badge key={m.id}>{m.label}</Badge>
           ))}
         </XStack>
       )}
