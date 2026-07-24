@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { YStack } from 'tamagui'
 
 import { Body, Card } from '../../components/ui'
 import { startRecording, stopRecording } from '../../services/recorder'
@@ -17,6 +18,7 @@ const label: Record<Status, string> = {
 /** Hold-to-talk control: records while held, uploads and adds to cart on release. See ADR-0004. */
 export function VoiceButton({ menu }: { menu: Menu }) {
   const [status, setStatus] = useState<Status>('idle')
+  const [unresolved, setUnresolved] = useState<string[]>([])
   const addLine = useCart((s) => s.addLine)
 
   function handlePressIn() {
@@ -30,9 +32,11 @@ export function VoiceButton({ menu }: { menu: Menu }) {
     try {
       const uri = await stopRecording()
       const response = await sendUtterance(uri)
-      for (const { product, modifiers, quantity } of resolveCartAdditions(response, menu)) {
+      const resolved = resolveCartAdditions(response, menu)
+      for (const { product, modifiers, quantity } of resolved.additions) {
         addLine(product, modifiers, quantity)
       }
+      setUnresolved(resolved.unresolved)
     } catch {
       // Failure handling is ticket #43 — swallow so a bad upload doesn't crash the button.
     } finally {
@@ -41,19 +45,25 @@ export function VoiceButton({ menu }: { menu: Menu }) {
   }
 
   return (
-    <Card
-      onPressIn={handlePressIn}
-      onPressOut={handlePressOut}
-      accessibilityRole="button"
-      accessibilityLabel="Hold to talk"
-      accessibilityState={{ busy: status !== 'idle' }}
-      items="center"
-      bg={status === 'recording' ? '$coral' : '$surfaceCard'}
-      pressStyle={{ bg: '$coralActive' }}
-    >
-      <Body strong={status !== 'idle'} color={status === 'recording' ? '$onPrimary' : '$ink'}>
-        {label[status]}
-      </Body>
-    </Card>
+    <YStack gap={8}>
+      <Card
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        accessibilityRole="button"
+        accessibilityLabel="Hold to talk"
+        accessibilityState={{ busy: status !== 'idle' }}
+        items="center"
+        bg={status === 'recording' ? '$coral' : '$surfaceCard'}
+        pressStyle={{ bg: '$coralActive' }}
+      >
+        <Body strong={status !== 'idle'} color={status === 'recording' ? '$onPrimary' : '$ink'}>
+          {label[status]}
+        </Body>
+      </Card>
+
+      {unresolved.length > 0 && (
+        <Body color="$muted">Couldn't find: {unresolved.join(', ')}</Body>
+      )}
+    </YStack>
   )
 }

@@ -42,6 +42,25 @@ it('turns a spoken utterance into cart lines, merges a repeat, and shows in the 
   expect(screen.getByText('Fries')).toBeOnTheScreen()
 })
 
+it('adds what resolved and reports what did not, then clears on a later success', async () => {
+  mockUtterance(
+    [{ productId: 'burger', modifierIds: [], quantity: 1 }],
+    ['something with chicken'],
+  )
+  await renderApp()
+
+  await speak()
+
+  expect(screen.getByLabelText('Cart')).toHaveTextContent('1')
+  expect(await screen.findByText("Couldn't find: something with chicken")).toBeOnTheScreen()
+
+  mockUtterance([{ productId: 'fries', modifierIds: [], quantity: 1 }])
+  await speak()
+
+  expect(screen.getByLabelText('Cart')).toHaveTextContent('2')
+  expect(screen.queryByText("Couldn't find: something with chicken")).not.toBeOnTheScreen()
+})
+
 it('shows recording while held and sending while the upload is in flight', async () => {
   server.use(
     http.post(`${API_URL}/utterances`, async () => {

@@ -14,16 +14,32 @@ export async function sendUtterance(uri: string): Promise<UtteranceResponse> {
 
 export type CartAddition = { product: Product; modifiers: Modifier[]; quantity: number }
 
-/** Resolves the response's references against the cached menu, same shape a tapped line takes. */
-export function resolveCartAdditions(response: UtteranceResponse, menu: Menu): CartAddition[] {
-  return response.lines.flatMap((line) => {
+export type ResolvedUtterance = { additions: CartAddition[]; unresolved: string[] }
+
+/**
+ * Resolves the response's references against the cached menu, same shape a tapped line takes.
+ * A product id missing from the menu is reported as unresolved, not dropped silently, so the
+ * guest can see something went unmatched and re-speak or tap it in by hand.
+ */
+export function resolveCartAdditions(response: UtteranceResponse, menu: Menu): ResolvedUtterance {
+  const additions: CartAddition[] = []
+  const unresolved = [...response.unresolved]
+
+  for (const line of response.lines) {
     const product = menu.find((p) => p.id === line.productId)
-    if (!product) return []
+    if (!product) {
+      // No spoken phrase survives to this point for an unknown id — the backend already
+      // resolved it to a productId. Report plainly rather than leak the raw id to the guest.
+      unresolved.push('something')
+      continue
+    }
 
     const modifiers = line.modifierIds
       .map((modifierId) => product.modifiers.find((m) => m.id === modifierId))
       .filter((m): m is Modifier => m != null)
 
-    return [{ product, modifiers, quantity: line.quantity }]
-  })
+    additions.push({ product, modifiers, quantity: line.quantity })
+  }
+
+  return { additions, unresolved }
 }
