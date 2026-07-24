@@ -107,6 +107,7 @@ function OrderRow({ order, menu }: { order: OperatorOrder; menu?: Menu }) {
         <YStack gap={4} mt={8}>
           {/* Index key: a placed order's lines never reorder, and carry no id. */}
           {order.lines.map((line, index) => (
+            // react-doctor-disable-next-line react-doctor/no-array-index-as-key
             <Body key={index} small>
               {describeLine(line, menu)}
             </Body>
