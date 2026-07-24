@@ -22,9 +22,12 @@ export function renderApp() {
   )
 }
 
-export function mockUtterance(lines: { productId: string; modifierIds: string[]; quantity: number }[]) {
+export function mockUtterance(
+  lines: { productId: string; modifierIds: string[]; quantity: number }[],
+  unresolved: string[] = [],
+) {
   server.use(
-    http.post(`${API_URL}/utterances`, () => HttpResponse.json({ lines, unresolved: [] })),
+    http.post(`${API_URL}/utterances`, () => HttpResponse.json({ lines, unresolved })),
   )
 }
 
