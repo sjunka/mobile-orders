@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { NativeStackScreenProps } from '@react-navigation/native-stack'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Controller, useForm, type Control } from 'react-hook-form'
 import { Input, ScrollView, XStack, YStack } from 'tamagui'
 import { z } from 'zod'
@@ -28,6 +28,8 @@ export function CheckoutScreen({ navigation }: Props) {
   // For the button only. The charged total is the server's — see back ADR-0002.
   const total = cartTotal(lines)
 
+  const queryClient = useQueryClient()
+
   const { control, handleSubmit } = useForm<Fields>({
     resolver: zodResolver(schema),
     defaultValues: checkoutDefaults(),
@@ -36,6 +38,7 @@ export function CheckoutScreen({ navigation }: Props) {
   const checkout = useMutation({
     mutationFn: (fields: Fields) => createOrder({ ...fields, lines: toOrderLines(lines) }),
     onSuccess: (order) => {
+      queryClient.invalidateQueries({ queryKey: ['orders'] }) // the new order belongs in the operator list
       // Replace, so the back gesture can't land on a checkout for a paid order.
       navigation.replace('Confirmation', order)
       clear() // after the swap, or Checkout re-renders as "Pay $0.00" first
