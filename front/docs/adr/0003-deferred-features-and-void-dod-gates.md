@@ -11,7 +11,7 @@ Each of the following is cut on purpose, not unfinished:
 - **Loyalty** — depends on accounts, which don't exist.
 - **Order history** — depends on accounts, which don't exist.
 - **Live order status** — needs a backend order-state machine and a push/poll channel; no such infra exists.
-- **Voice AI** — a separate ordering surface, orthogonal to the Menu → Cart → Checkout slice this app builds first.
+- **Voice AI** — a separate ordering surface, orthogonal to the Menu → Cart → Checkout slice this app builds first. This held until #39: voice turned out to be an input method, not a surface — it only ever produces cart lines and reuses the Menu → Cart → Checkout slice wholesale, so the reasoning above no longer applies to it. Un-deferred; see ADR-0004 for the architecture. The other five deferrals are untouched.
 
 The backend's own rejection of auth is recorded on the backend side, in its own ADR-0001. It is not restated here.
 

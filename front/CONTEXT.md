@@ -49,3 +49,11 @@ The mock charge run at checkout. Succeeds or is declined based on the input.
 A card number ending in `0002` is declined (e.g. `4000000000000002`); any other
 16-digit number is paid.
 _Avoid_: Transaction, charge
+
+**Utterance**:
+One hold-to-release recording. The unit voice works in.
+_Avoid_: Command, voice order
+
+**Unresolved phrase**:
+A fragment of an utterance matching no product. Reported to the guest, never added.
+_Avoid_: Error, unmatched item
