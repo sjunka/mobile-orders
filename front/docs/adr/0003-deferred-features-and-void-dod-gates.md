@@ -27,6 +27,10 @@ The guide's Definition of Done names a coverage percentage. This gate is void be
 
 The bar is behavior covered, not a percentage: the RNTL Menu → Cart → Checkout flow test, including the decline-then-retry path, plus the backend's Supertest suite. Between the two, every branch of the money path is exercised by an assertion on observable behavior.
 
+## Android is verified
+
+The guide's "app builds on iOS and Android" line is answered. On 2026-07-24 the app was built and launched on an Android 16 (API 36, arm64) emulator through Expo Go, on the shipped startup path — no in-app mock — with the backend running and reached over `EXPO_PUBLIC_API_URL`. The menu loaded from the backend and a checkout completed: order `ORD-8`, $10.50, recorded by the backend as paid.
+
 ## Consequences
 
 - Front ADR-0001 stands unedited — this ADR narrows the guide's feature list and voids its DoD gates; it does not touch the mock-at-network-layer decision.
