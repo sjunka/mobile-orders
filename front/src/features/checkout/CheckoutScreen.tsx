@@ -6,7 +6,7 @@ import { Button, Input, Separator, Text, YStack } from 'tamagui'
 import { z } from 'zod'
 
 import type { RootStackParamList } from '../../navigation/types'
-import { pay } from '../../services/payment'
+import { createOrder, toOrderLines } from '../../services/order'
 import { useCart } from '../../store/cart'
 import { cartTotal, formatPrice } from '../../utils/price'
 
@@ -23,6 +23,7 @@ type Props = NativeStackScreenProps<RootStackParamList, 'Checkout'>
 export function CheckoutScreen({ navigation }: Props) {
   const lines = useCart((s) => s.lines)
   const clear = useCart((s) => s.clear)
+  // For the button only. The charged total is the server's — see back ADR-0002.
   const total = cartTotal(lines)
 
   const { control, handleSubmit } = useForm<Fields>({
@@ -31,7 +32,7 @@ export function CheckoutScreen({ navigation }: Props) {
   })
 
   const payment = useMutation({
-    mutationFn: (fields: Fields) => pay({ ...fields, total }),
+    mutationFn: (fields: Fields) => createOrder({ ...fields, lines: toOrderLines(lines) }),
     onSuccess: (order) => {
       // Replace, so the back gesture can't land on a checkout for a paid order.
       navigation.replace('Confirmation', order)
