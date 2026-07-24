@@ -26,7 +26,7 @@ import type { RootStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
-const headerTitleStyle = {
+const serifTitle = {
   fontFamily: Platform.select({ ios: 'Georgia', default: 'serif' }),
   fontWeight: '400' as const,
   fontSize: 19,
@@ -37,7 +37,7 @@ const screenOptions = {
   headerStyle: { backgroundColor: claudeColors.canvas },
   headerTintColor: claudeColors.ink,
   headerShadowVisible: false,
-  headerTitleStyle,
+  headerTitleStyle: serifTitle,
   contentStyle: { backgroundColor: claudeColors.canvas },
 }
 
@@ -128,7 +128,7 @@ export function RootNavigator() {
               accessibilityRole="button"
               accessibilityLabel="Orders"
               pressStyle={{ opacity: 0.6 }}
-              style={headerTitleStyle}
+              style={serifTitle}
             >
               Orders
             </Text>

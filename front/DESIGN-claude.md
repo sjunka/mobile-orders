@@ -506,6 +506,8 @@ When photography is used (rare — mostly testimonials), avatars crop to perfect
 
 **`badge-pill`** — Small pill label used for category tags. Background `{colors.surface-card}`, text `{colors.ink}`, type `{typography.caption}` (13px / 500), rounded `{rounded.pill}`, padding 4px × 12px.
 
+**`badge-pill-soft`** — `badge-pill` with a soft coral fill `{colors.coral-soft}` (#f6e7e0) and a 1px `{colors.coral-active}` border. Used for menu modifier pills so they read against the card.
+
 **`badge-coral`** — Coral-fill badge for "NEW", "BETA", featured highlights. Background `{colors.primary}`, text `{colors.on-primary}`, type `{typography.caption-uppercase}` (12px / 500 / 1.5px tracking), rounded `{rounded.pill}`, padding 4px × 12px.
 
 ### Tab / Filter
