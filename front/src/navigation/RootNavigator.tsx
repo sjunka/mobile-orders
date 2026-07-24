@@ -11,7 +11,7 @@ import Animated, {
   withRepeat,
   withTiming,
 } from 'react-native-reanimated'
-import { Text, View, XStack } from 'tamagui'
+import { Text, View } from 'tamagui'
 
 import { claudeColors } from '../../tamagui.config'
 import { CartIcon } from '../components/ui'
@@ -26,16 +26,18 @@ import type { RootStackParamList } from './types'
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 
+const serifTitle = {
+  fontFamily: Platform.select({ ios: 'Georgia', default: 'serif' }),
+  fontWeight: '400' as const,
+  fontSize: 19,
+  color: claudeColors.ink,
+}
+
 const screenOptions = {
   headerStyle: { backgroundColor: claudeColors.canvas },
   headerTintColor: claudeColors.ink,
   headerShadowVisible: false,
-  headerTitleStyle: {
-    fontFamily: Platform.select({ ios: 'Georgia', default: 'serif' }),
-    fontWeight: '400' as const,
-    fontSize: 19,
-    color: claudeColors.ink,
-  },
+  headerTitleStyle: serifTitle,
   contentStyle: { backgroundColor: claudeColors.canvas },
 }
 
@@ -119,22 +121,19 @@ export function RootNavigator() {
         component={MenuScreen}
         options={({ navigation }) => ({
           title: 'Menu',
-          headerRight: () => (
-            <XStack items="center" gap={16}>
-              {/* No auth, so any guest can open the operator list. See back ADR-0003. */}
-              <Text
-                onPress={() => navigation.navigate('Orders')}
-                accessibilityRole="button"
-                accessibilityLabel="Orders"
-                color="$ink"
-                fontSize={16}
-                pressStyle={{ opacity: 0.6 }}
-              >
-                Orders
-              </Text>
-              <CartButton onPress={() => navigation.navigate('Cart')} />
-            </XStack>
+          headerLeft: () => (
+            /* No auth, so any guest can open the operator list. See back ADR-0003. */
+            <Text
+              onPress={() => navigation.navigate('Orders')}
+              accessibilityRole="button"
+              accessibilityLabel="Orders"
+              pressStyle={{ opacity: 0.6 }}
+              style={serifTitle}
+            >
+              Orders
+            </Text>
           ),
+          headerRight: () => <CartButton onPress={() => navigation.navigate('Cart')} />,
         })}
       />
       <Stack.Screen
