@@ -1,7 +1,7 @@
 import { http, HttpResponse } from 'msw'
 
 import { API_URL } from '../api/client'
-import type { CreateOrderRequest, OrderLineRequest } from '../types/order'
+import type { CreateOrderRequest, OperatorOrder, OrderLineRequest } from '../types/order'
 import { linePrice } from '../utils/price'
 import { menu } from './menu-data'
 
@@ -20,13 +20,19 @@ function priceLine(line: OrderLineRequest): number {
   return linePrice(product.basePrice, modifiers, line.quantity)
 }
 
+// Orders the mock has been posted, so the operator screen has something to list
+// with no backend running. Dies with the reload, same as the real in-memory store.
+const placed: OperatorOrder[] = []
+
 export const handlers = [
   http.get(`${API_URL}/menu`, () => HttpResponse.json(menu)),
+
+  http.get(`${API_URL}/orders`, () => HttpResponse.json(placed)),
 
   // Mirrors POST /orders: the server prices the lines, then charges. A card
   // ending 0002 is declined. Every failure is a single readable message.
   http.post(`${API_URL}/orders`, async ({ request }) => {
-    const { cardNumber, lines } = (await request.json()) as CreateOrderRequest
+    const { name, email, cardNumber, lines } = (await request.json()) as CreateOrderRequest
 
     if (!lines?.length) {
       return HttpResponse.json({ message: 'Your order is empty.' }, { status: 400 })
@@ -43,6 +49,10 @@ export const handlers = [
       return HttpResponse.json({ message: 'Your card was declined.' }, { status: 402 })
     }
 
-    return HttpResponse.json({ orderId: `ORD-${Date.now()}`, total })
+    const orderId = `ORD-${placed.length + 1}`
+    placed.push({ orderId, guest: { name, email }, total, lines, status: 'paid' })
+
+    // The guest gets the id and the total — never the stored lines.
+    return HttpResponse.json({ orderId, total })
   }),
 ]

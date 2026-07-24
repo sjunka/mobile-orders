@@ -24,6 +24,13 @@ export class OrdersController {
     return { orderId, total };
   }
 
+  // The operator list: every order, guest identity included, no auth. Anyone
+  // who can reach the API can read every guest's name and email — see ADR-0003.
+  @Get()
+  findAll(): Order[] {
+    return this.ordersService.findAll();
+  }
+
   // For verifying what the server recorded. The app never calls this.
   @Get(':orderId')
   find(@Param('orderId') orderId: string): Omit<Order, 'guest'> {
@@ -33,6 +40,11 @@ export class OrdersController {
     }
     // No caller identity (ADR-0001) and ids run in sequence, so the guest stays
     // out of the response — anyone could count their way to this route.
-    return { orderId: order.orderId, total: order.total, lines: order.lines };
+    return {
+      orderId: order.orderId,
+      total: order.total,
+      lines: order.lines,
+      status: order.status,
+    };
   }
 }

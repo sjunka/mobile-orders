@@ -5,5 +5,5 @@ The prototype guide specifies `POST /auth/login`, a users fixture, and cart endp
 ## Consequences
 
 - The backend is two modules: `menu` and `orders`.
-- `GET /orders` (list all) does not exist. With no caller identity it could only return every order ever placed, and no screen consumes it. Order history arrives with auth, if auth ever arrives.
+- `GET /orders` (list all) does not exist. With no caller identity it could only return every order ever placed, and no screen consumes it. Order history arrives with auth, if auth ever arrives. **Amended:** the operator screen is that screen, and `GET /orders` now exists, unguarded and returning guest identity — see ADR-0003.
 - Guest identity is unverified. Anyone can place an order under any name and email. Acceptable for a prototype; the first thing to revisit before this is reachable from outside a laptop.

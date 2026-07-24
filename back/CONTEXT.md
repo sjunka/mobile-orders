@@ -28,6 +28,10 @@ _Avoid_: Purchase, transaction, receipt
 A person ordering without an account. Identity arrives with the order, not from a login.
 _Avoid_: User, customer, account
 
+**Operator**:
+Whoever runs the shop. Sees every order, may cancel any of them. Unauthenticated in this prototype — nothing tells an operator from a guest (see ADR-0003).
+_Avoid_: Admin, staff, manager
+
 **Payment**:
 The mock charge run while creating an order. Succeeds, or declines the whole order.
 _Avoid_: Transaction, charge
