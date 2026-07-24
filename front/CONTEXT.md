@@ -32,6 +32,10 @@ _Avoid_: Purchase, buy
 A cart the guest has paid for. The result of a successful checkout.
 _Avoid_: Purchase, transaction, receipt
 
+**Cancelled order**:
+An order an operator has called off. Stays in the list; one-way, no un-cancel; no refund is modelled.
+_Avoid_: Deleted, voided, refunded
+
 **Guest**:
 A person ordering without an account. Identity is collected at checkout, not via login.
 _Avoid_: User, customer, account

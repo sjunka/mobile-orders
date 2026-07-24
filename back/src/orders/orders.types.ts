@@ -25,12 +25,13 @@ export type CreateOrder = {
  * computed by the server. The card number is never kept.
  *
  * `status` is `paid` from creation: the charge runs before the order exists, so
- * an unpaid one is unrepresentable. It widens when cancellation lands.
+ * an unpaid one is unrepresentable. `cancelled` is one-way — there is no route
+ * or state back to `paid`.
  */
 export type Order = {
   orderId: string;
   guest: Guest;
   total: number;
   lines: OrderLine[];
-  status: 'paid';
+  status: 'paid' | 'cancelled';
 };

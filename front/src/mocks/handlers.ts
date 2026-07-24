@@ -55,4 +55,14 @@ export const handlers = [
     // The guest gets the id and the total — never the stored lines.
     return HttpResponse.json({ orderId, total })
   }),
+
+  // Mirrors POST /orders/:orderId/cancel: idempotent, not-found on an unknown id.
+  http.post(`${API_URL}/orders/:orderId/cancel`, ({ params }) => {
+    const order = placed.find((candidate) => candidate.orderId === params.orderId)
+    if (!order) {
+      return HttpResponse.json({ message: 'We could not find that order.' }, { status: 404 })
+    }
+    order.status = 'cancelled'
+    return HttpResponse.json(order)
+  }),
 ]

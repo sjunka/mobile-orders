@@ -28,5 +28,5 @@ export type OperatorOrder = {
   guest: { name: string; email: string }
   total: number
   lines: OrderLineRequest[]
-  status: 'paid'
+  status: 'paid' | 'cancelled'
 }

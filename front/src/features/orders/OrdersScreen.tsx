@@ -1,9 +1,9 @@
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { ScrollView, Spinner, XStack, YStack } from 'tamagui'
 
-import { Badge, Body, Card, Display, PrimaryButton, Screen } from '../../components/ui'
-import { listOrders } from '../../services/order'
+import { Badge, Body, Card, Display, PrimaryButton, Screen, SecondaryButton } from '../../components/ui'
+import { cancelOrder, listOrders } from '../../services/order'
 import type { Menu } from '../../types/menu'
 import type { OperatorOrder, OrderLineRequest } from '../../types/order'
 import { formatPrice } from '../../utils/price'
@@ -62,9 +62,16 @@ export function OrdersScreen() {
 
 function OrderRow({ order, menu }: { order: OperatorOrder; menu?: Menu }) {
   const [open, setOpen] = useState(false)
+  const queryClient = useQueryClient()
+  const cancel = useMutation({
+    mutationFn: () => cancelOrder(order.orderId),
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['orders'] }),
+  })
+  const cancelled = order.status === 'cancelled'
 
   return (
     <Card
+      opacity={cancelled ? 0.5 : 1}
       pressStyle={{ bg: '$surfaceCreamStrong' }}
       onPress={() => setOpen(!open)}
       accessibilityRole="button"
@@ -82,6 +89,18 @@ function OrderRow({ order, menu }: { order: OperatorOrder; menu?: Menu }) {
           {order.orderId}
         </Body>
         <Badge>{order.status}</Badge>
+        {/* Immediate — no confirmation dialog. Cancelling is one-way. */}
+        {!cancelled && (
+          <SecondaryButton
+            size="$2"
+            onPress={(event) => {
+              event.stopPropagation()
+              cancel.mutate()
+            }}
+          >
+            Cancel
+          </SecondaryButton>
+        )}
       </XStack>
 
       {open && (
