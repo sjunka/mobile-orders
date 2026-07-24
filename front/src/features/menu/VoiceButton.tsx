@@ -15,15 +15,33 @@ const label: Record<Status, string> = {
   sending: 'Adding to cart…',
 }
 
+const PERMISSION_DENIED = 'Microphone permission denied'
+// Both mean the press was too short to produce audio — a no-op, not an error.
+const NO_AUDIO = new Set(['Not recording', 'Recording produced no file'])
+
+function messageFor(error: unknown): string {
+  if (error instanceof Error && error.message.startsWith('Request failed:')) {
+    return 'Something went wrong on our end — try again.'
+  }
+  return "Couldn't reach the server — nothing was ordered."
+}
+
 /** Hold-to-talk control: records while held, uploads and adds to cart on release. See ADR-0004. */
 export function VoiceButton({ menu }: { menu: Menu }) {
   const [status, setStatus] = useState<Status>('idle')
-  const [unresolved, setUnresolved] = useState<string[]>([])
+  const [message, setMessage] = useState<string | null>(null)
   const addLine = useCart((s) => s.addLine)
 
   function handlePressIn() {
     setStatus('recording')
-    startRecording().catch(() => setStatus('idle'))
+    startRecording().catch((error: unknown) => {
+      setStatus('idle')
+      if (error instanceof Error && error.message === PERMISSION_DENIED) {
+        setMessage('Voice needs microphone access.')
+      } else {
+        setMessage(messageFor(error))
+      }
+    })
   }
 
   async function handlePressOut() {
@@ -36,9 +54,19 @@ export function VoiceButton({ menu }: { menu: Menu }) {
       for (const { product, modifiers, quantity } of resolved.additions) {
         addLine(product, modifiers, quantity)
       }
-      setUnresolved(resolved.unresolved)
-    } catch {
-      // Failure handling is ticket #43 — swallow so a bad upload doesn't crash the button.
+      if (resolved.additions.length === 0 && resolved.unresolved.length === 0) {
+        setMessage("Didn't catch that — try speaking again.")
+      } else if (resolved.unresolved.length > 0) {
+        setMessage(`Couldn't find: ${resolved.unresolved.join(', ')}`)
+      } else {
+        setMessage(null)
+      }
+    } catch (error) {
+      if (error instanceof Error && NO_AUDIO.has(error.message)) {
+        // Press too fast to record anything — silent no-op, no request went out.
+      } else {
+        setMessage(messageFor(error))
+      }
     } finally {
       setStatus('idle')
     }
@@ -61,9 +89,7 @@ export function VoiceButton({ menu }: { menu: Menu }) {
         </Body>
       </Card>
 
-      {unresolved.length > 0 && (
-        <Body color="$muted">Couldn't find: {unresolved.join(', ')}</Body>
-      )}
+      {message != null && <Body color="$muted">{message}</Body>}
     </YStack>
   )
 }
