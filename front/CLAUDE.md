@@ -23,7 +23,7 @@ Don't build deferred features speculatively.
 - **Tamagui v2** for UI.
 - **React Navigation** in `navigation/` — not Expo Router (see ADR-0002).
 - **TanStack Query** for server data; **Zustand** for cart and local UI state.
-- **MSW** mocks at the network layer (see ADR-0001). One `ApiXService` per domain hits HTTP; MSW returns mock responses in dev. No Mock/Api class swap — production repoints the base URL.
+- **MSW** mocks at the network layer (see ADR-0001). One `ApiXService` per domain hits HTTP; MSW answers in Jest only, the running app talks to the real backend. No Mock/Api class swap — production repoints the base URL.
 - React Hook Form + Zod for forms.
 
 ## Folder structure
